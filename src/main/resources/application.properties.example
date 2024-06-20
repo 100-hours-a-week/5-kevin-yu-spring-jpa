@@ -1,0 +1,13 @@
+spring.application.name=5-kevin-yu-spring-jpa
+
+# change if using other database
+spring.datasource.url=jdbc:mysql://localhost:3306/your_database
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+# change if using other database
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+# change if using other database
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
