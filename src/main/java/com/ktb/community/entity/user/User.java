@@ -1,5 +1,7 @@
 package com.ktb.community.entity.user;
 
+import com.ktb.community.dto.user.UserRequestDto;
+import com.ktb.community.dto.user.UserResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,8 +33,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @Column(name = "joined_at", insertable = false)
-    private LocalDateTime joinedAt;
+    @Column(name = "joined_at")
+    private LocalDateTime joinedAt = LocalDateTime.now();
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
@@ -40,4 +42,25 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    public UserResponseDto toResponseDto() {
+        return UserResponseDto.builder()
+                .id(id)
+                .email(email)
+                .nickname(nickname)
+                .profileImage(profileImage)
+                .build();
+    }
+
+    public void updateUser(UserRequestDto userRequestDto) {
+        this.nickname = userRequestDto.getNickname();
+        this.password = userRequestDto.getPassword();
+        this.profileImage = userRequestDto.getProfileImage();
+    }
+
+    public void changeStatus(UserStatus status) {
+        this.status = status;
+
+        if (status == UserStatus.DELETED)
+            deletedAt = LocalDateTime.now();
+    }
 }

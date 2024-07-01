@@ -1,16 +1,22 @@
 package com.ktb.community.repository.user;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+import com.ktb.community.dto.post.PostRequestDto;
+import com.ktb.community.dto.post.PostResponseDto;
+import com.ktb.community.dto.user.UserRequestDto;
+import com.ktb.community.dto.user.UserResponseDto;
 
-@Repository
-public class UserRepository {
+import java.util.List;
+import java.util.Optional;
 
-    private final JdbcTemplate jdbcTemplate;
+public interface UserRepository {
 
-    public UserRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    UserResponseDto save(UserRequestDto dto);
 
+    List<UserResponseDto> findAll();
 
+    Optional<UserResponseDto> findById(Long userId);
+
+    void modify(UserRequestDto dto);
+
+    void remove(Long userId);
 }
