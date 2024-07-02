@@ -1,6 +1,9 @@
 package com.ktb.community.dto.post;
 
+import com.ktb.community.entity.post.Post;
+import com.ktb.community.entity.user.User;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +21,16 @@ public class PostRequestDto {
     private String content;
 
     private String postImage;
+
+    @NotNull
+    private Long userId;
+
+    public Post toEntity(User user) {
+        return Post.builder()
+                .title(title)
+                .content(content)
+                .postImage(postImage)
+                .user(user)
+                .build();
+    }
 }

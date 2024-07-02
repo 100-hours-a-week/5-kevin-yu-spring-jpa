@@ -1,20 +1,19 @@
 package com.ktb.community.repository.user;
 
-import com.ktb.community.dto.post.PostRequestDto;
-import com.ktb.community.dto.post.PostResponseDto;
 import com.ktb.community.dto.user.UserRequestDto;
 import com.ktb.community.dto.user.UserResponseDto;
+import com.ktb.community.entity.user.User;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
 
-    UserResponseDto save(UserRequestDto dto);
+    User save(User user);
 
-    List<UserResponseDto> findAll();
+    List<User> findAll();
 
-    Optional<UserResponseDto> findById(Long userId);
+    Optional<User> findById(Long userId);
 
     void modify(UserRequestDto dto);
 

@@ -1,7 +1,8 @@
 package com.ktb.community.repository.user;
 
 import com.ktb.community.dto.user.UserRequestDto;
-import com.ktb.community.dto.user.UserResponseDto;
+import com.ktb.community.entity.user.User;
+import com.ktb.community.entity.user.UserStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -32,40 +33,46 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserResponseDto save(UserRequestDto dto) {
-        SqlParameterSource param = new BeanPropertySqlParameterSource(dto);
+    public User save(User user) {
+        SqlParameterSource param = new BeanPropertySqlParameterSource(user);
         Long id = jdbcInsert.executeAndReturnKey(param).longValue();
 
-        return UserResponseDto.builder()
-                .id(id)
-                .email(dto.getEmail())
-                .nickname(dto.getNickname())
-                .profileImage(dto.getProfileImage())
-                .build();
+        user.setId(id);
+        return user;
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
-        String sql = "SELECT user_id, email, nickname, profile_image FROM users WHERE status = 'ACTIVE'";
+    public List<User> findAll() {
+        String sql = "SELECT * FROM users WHERE status = 'ACTIVE'";
 
         return template.query(sql, userRowMapper());
     }
 
     @Override
-    public Optional<UserResponseDto> findById(Long userId) {
+    public Optional<User> findById(Long userId) {
         String sql = "SELECT * FROM users WHERE user_id = :user_id AND status = 'ACTIVE'";
 
         try {
             SqlParameterSource param = new MapSqlParameterSource().addValue("user_id", userId);
-            return Optional.of(template.queryForObject(sql, param, userRowMapper())
-            );
+            return Optional.of(template.queryForObject(sql, param, userRowMapper()));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
-    private RowMapper<UserResponseDto> userRowMapper() {
-        return BeanPropertyRowMapper.newInstance(UserResponseDto.class);
+    private RowMapper<User> userRowMapper() {
+        return (rs, rowNum) -> User.builder()
+                .id(rs.getLong("user_id"))
+                .email(rs.getString("email"))
+                .password(rs.getString("password"))
+                .nickname(rs.getString("nickname"))
+                .status(UserStatus.valueOf(rs.getString("status")))
+                .joinedAt(rs.getTimestamp("joined_at").toLocalDateTime())
+                .lastLogin(rs.getTimestamp("last_login") != null ?
+                        rs.getTimestamp("last_login").toLocalDateTime() : null)
+                .deletedAt(rs.getTimestamp("deleted_at") != null ?
+                        rs.getTimestamp("deleted_at").toLocalDateTime() : null)
+                .build();
     }
 
     @Override

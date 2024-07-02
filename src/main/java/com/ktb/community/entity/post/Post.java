@@ -48,7 +48,7 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
-    public PostResponseDto toResponseDto() {
+    public PostResponseDto toDto() {
         return PostResponseDto.builder()
                 .id(id)
                 .title(title)
@@ -66,10 +66,6 @@ public class Post {
         this.title = dto.getTitle();
         this.content = dto.getContent();
         this.postImage = dto.getPostImage();
-    }
-
-    public void registWriter(User user) {
-        this.user = user;
     }
 
     public void deletePost() {

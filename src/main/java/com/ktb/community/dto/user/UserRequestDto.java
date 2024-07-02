@@ -1,5 +1,6 @@
 package com.ktb.community.dto.user;
 
+import com.ktb.community.entity.user.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequestDto {
+    // 수정할 때 사용 (@NotNull이 없는 이유)
     private Long id;
 
     @NotBlank
@@ -25,4 +27,14 @@ public class UserRequestDto {
     private String nickname;
 
     private String profileImage;
+
+    public User toEntity() {
+        return User.builder()
+                .id(id) // 등록할 때는 null로 초기화 돼서 상관없음
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .profileImage(profileImage)
+                .build();
+    }
 }

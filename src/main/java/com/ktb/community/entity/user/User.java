@@ -18,6 +18,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
+    @Setter
     private Long id;
 
     private String email;
@@ -42,7 +43,7 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public UserResponseDto toResponseDto() {
+    public UserResponseDto toDto() {
         return UserResponseDto.builder()
                 .id(id)
                 .email(email)
