@@ -1,12 +1,15 @@
 package com.ktb.community.dto.user;
 
 import com.ktb.community.entity.user.User;
+import com.ktb.community.entity.user.UserStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -35,6 +38,8 @@ public class UserRequestDto {
                 .password(password)
                 .nickname(nickname)
                 .profileImage(profileImage)
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
                 .build();
     }
 }

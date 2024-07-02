@@ -33,18 +33,18 @@ public class Post {
     private String postImage;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(insertable = false)
+    @Column
     private int views;
 
     @Column(name = "comment_count")
     private int commentCount;
 
-    @Column(insertable = false)
+    @Column
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
