@@ -28,8 +28,6 @@ public class PostRequestDto {
 
     private String postImage;
 
-    private MultipartFile file;
-
     public Post toEntity(User user) {
         return Post.builder()
                 .title(title)

@@ -12,6 +12,7 @@ import com.ktb.community.utils.MultipartFileSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,11 +28,11 @@ public class PostService {
     private final MultipartFileSender fileSender;
 
     @Transactional
-    public Long addPost(PostRequestDto requestDto, Long userId) {
+    public Long addPost(PostRequestDto requestDto, MultipartFile file, Long userId) {
         if (validRequestDto(requestDto))
             throw new IllegalArgumentException(ILLEGAL_POST_REQUEST_DTO);
 
-        String imageName = fileSender.sendFile(requestDto.getFile(), "posts");
+        String imageName = file == null ? "" : fileSender.sendFile(file, "posts");
         requestDto.setPostImage(imageName);
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
