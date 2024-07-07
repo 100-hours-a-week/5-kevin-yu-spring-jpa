@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostRequestDto {
+    private Long id;
+
     @NotBlank
     private String title;
 
@@ -25,8 +28,7 @@ public class PostRequestDto {
 
     private String postImage;
 
-    @NotNull
-    private Long userId;
+    private MultipartFile file;
 
     public Post toEntity(User user) {
         return Post.builder()

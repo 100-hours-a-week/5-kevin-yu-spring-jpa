@@ -33,6 +33,7 @@ public class PostRepositoryImpl implements PostRepository {
     public List<Post> findAll() {
         return queryFactory
                 .selectFrom(post)
+                .orderBy(post.createdAt.desc())
                 .fetch();
     }
 
