@@ -47,10 +47,10 @@ public class UserController {
 
     @PutMapping
     public ResponseEntity<?> changeUserInfo(@RequestParam String nickname, @RequestParam(required = false) MultipartFile file) {
-        log.info("nickname: {}, file: {}", nickname, file);
+        Long userId = getUserId();
 
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = userDetails.getUser().getId();
+        if (!StringUtils.hasText(nickname))
+            return ResponseEntity.badRequest().build();
 
         if (userId == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -66,8 +66,7 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<?> withdraw() {
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = userDetails.getUser().getId();
+        Long userId = getUserId();
 
         if (userId == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -81,8 +80,6 @@ public class UserController {
 
     @PostMapping("/join")
     public ResponseEntity<?> join(@Valid @RequestBody UserRequestDto requestDto, BindingResult bindingResult) {
-        log.info("requestDto: {}", requestDto);
-
         if (bindingResult.hasErrors()) {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 log.info(fieldError.getDefaultMessage());
@@ -124,10 +121,7 @@ public class UserController {
         if (!StringUtils.hasText(nickname))
             return ResponseEntity.badRequest().build();
 
-        log.info("nickname: {}", nickname);
-
         boolean isDuplicateNickname = userService.isAlreadyExist(nickname);
-        log.info("isDuplicateNickname: {}", isDuplicateNickname);
 
         if (isDuplicateNickname)
             return ResponseEntity.status(HttpStatus.CONFLICT).build();

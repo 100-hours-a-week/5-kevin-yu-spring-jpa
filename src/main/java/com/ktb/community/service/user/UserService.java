@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.ktb.community.utils.ExceptionMessageConst.*;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,36 +24,25 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponseDto findUserById(Long userId) {
-        if (userId == null)
-            throw new IllegalArgumentException(ILLEGAL_USER_ID);
-
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        log.info(user.toString());
+
         return user.toDto();
     }
 
     @Transactional(readOnly = true)
     public UserResponseDto findUserByEmail(String email) {
-        if (email == null)
-            throw new IllegalArgumentException(ILLEGAL_EMAIL);
-
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
         return user.toDto();
     }
 
     @Transactional(readOnly = true)
     public boolean isAlreadyExist(String nickname) {
-        if (nickname == null)
-            throw new IllegalArgumentException(ILLEGAL_NICKNAME);
-
         return userRepository.countByNickname(nickname) != 0;
     }
 
     @Transactional
     public void changeUserInfo(UserRequestDto userRequestDto, MultipartFile file) {
-        if (userRequestDto == null || userRequestDto.getId() == null || userRequestDto.getNickname() == null)
-            throw new IllegalArgumentException(ILLEGAL_USER_REQUEST_DTO);
-
         User user = userRepository.findById(userRequestDto.getId()).orElseThrow(UserNotFoundException::new);
         String prevImage = user.getProfileImage();
 
@@ -74,9 +61,6 @@ public class UserService {
 
     @Transactional
     public void deleteUserById(Long userId) {
-        if (userId == null)
-            throw new IllegalArgumentException(ILLEGAL_USER_ID);
-
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         clientServerHandler.requestDeleteFile("users", user.getProfileImage());
 
@@ -85,10 +69,8 @@ public class UserService {
 
     @Transactional
     public void recordLoginAttempt(Long userId) {
-        if (userId == null)
-            throw new IllegalArgumentException(ILLEGAL_USER_ID);
-
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
         userRepository.modifyLoginTime(user.getId());
     }
 }
