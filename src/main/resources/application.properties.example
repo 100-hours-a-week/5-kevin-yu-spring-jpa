@@ -11,3 +11,9 @@ spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=true
 # change if using other database
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# environment variables
+jwt.expiration-time=86400000
+jwt.secret=your_secret_key
+
+cors.allowed.origin=your_origin

@@ -40,6 +40,7 @@ public class UserRequestDto {
                 .profileImage(profileImage)
                 .status(UserStatus.ACTIVE)
                 .joinedAt(LocalDateTime.now())
+                .role("ROLE_USER")
                 .build();
     }
 }

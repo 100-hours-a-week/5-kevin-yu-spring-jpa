@@ -35,13 +35,15 @@ public class User {
     private UserStatus status;
 
     @Column(name = "joined_at")
-    private LocalDateTime joinedAt = LocalDateTime.now();
+    private LocalDateTime joinedAt;
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    private String role;
 
     public UserResponseDto toDto() {
         return UserResponseDto.builder()

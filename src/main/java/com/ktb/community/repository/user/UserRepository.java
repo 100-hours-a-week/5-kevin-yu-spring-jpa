@@ -1,7 +1,6 @@
 package com.ktb.community.repository.user;
 
 import com.ktb.community.dto.user.UserRequestDto;
-import com.ktb.community.dto.user.UserResponseDto;
 import com.ktb.community.entity.user.User;
 
 import java.util.List;
@@ -15,7 +14,15 @@ public interface UserRepository {
 
     Optional<User> findById(Long userId);
 
-    void modify(UserRequestDto dto);
+    Optional<User> findByEmail(String email);
+
+    Integer countByNickname(String nickname);
+
+    void modifyUserInfo(UserRequestDto dto);
+
+    void modifyPassword(Long userId, String newPassword);
+
+    void modifyLoginTime(Long userId);
 
     void remove(Long userId);
 }
