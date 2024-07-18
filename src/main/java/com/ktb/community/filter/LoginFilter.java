@@ -2,7 +2,6 @@ package com.ktb.community.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktb.community.dto.user.CustomUserDetails;
-import com.ktb.community.dto.user.SecurityService;
 import com.ktb.community.dto.user.UserRequestDto;
 import com.ktb.community.dto.user.UserResponseDto;
 import com.ktb.community.security.JWTUtil;

@@ -1,6 +1,5 @@
 package com.ktb.community.config;
 
-import com.ktb.community.dto.user.SecurityService;
 import com.ktb.community.filter.JWTFilter;
 import com.ktb.community.filter.LoginFilter;
 import com.ktb.community.security.JWTUtil;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
