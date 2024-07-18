@@ -1,5 +1,6 @@
-package com.ktb.community.dto.user;
+package com.ktb.community.security;
 
+import com.ktb.community.dto.user.UserRequestDto;
 import com.ktb.community.entity.user.User;
 import com.ktb.community.exception.EmailAlreadyExistException;
 import com.ktb.community.exception.PasswordAlreadyExistException;

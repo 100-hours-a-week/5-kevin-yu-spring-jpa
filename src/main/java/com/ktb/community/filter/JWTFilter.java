@@ -27,7 +27,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             log.info(request.getRequestURI());
-            if (request.getRequestURI().equals("/json/users/login")) {
+            if (request.getRequestURI().equals("/json/users/login") ||
+                    request.getRequestURI().equals("/json/users/join")) {
                 filterChain.doFilter(request, response);
                 return;
             }

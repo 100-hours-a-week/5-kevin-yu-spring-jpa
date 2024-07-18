@@ -1,8 +1,10 @@
 package com.ktb.community.utils;
 
+import com.ktb.community.exception.DeleteImageFailedException;
 import com.ktb.community.exception.FileSendFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -16,18 +18,18 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class MultipartFileSender {
+public class ClientServerHandler {
 
     private final WebClient webClient;
 
-    public MultipartFileSender(ClientHttpConnector clientHttpConnector) {
+    public ClientServerHandler(ClientHttpConnector clientHttpConnector) {
         this.webClient = WebClient.builder()
                 .baseUrl("http://localhost:3000")
                 .clientConnector(clientHttpConnector)
                 .build();
     }
 
-    public String sendFile(MultipartFile file, String prevImage, String uri, MultipartFileSenderMethod method) {
+    public String sendFile(MultipartFile file, String prevImage, String uri, ClientServerHandlerMethod method) {
         if (file == null)
             throw new IllegalArgumentException(ExceptionMessageConst.ILLEGAL_FILE);
 
@@ -54,5 +56,20 @@ public class MultipartFileSender {
 
         Map<String, String> responseMap = response.getBody();
         return responseMap.get("imageName");
+    }
+
+    public HttpStatus requestDeleteFile(String uri, String imageName) {
+        uri += "?image=" + imageName;
+
+        ResponseEntity<Void> responseEntity = webClient.delete()
+                .uri(uri)
+                .retrieve()
+                .toBodilessEntity()
+                .block();
+
+        if(responseEntity == null)
+            throw new DeleteImageFailedException();
+
+        return HttpStatus.valueOf(responseEntity.getStatusCode().value());
     }
 }
