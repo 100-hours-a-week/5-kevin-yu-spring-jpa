@@ -1,6 +1,7 @@
 package com.ktb.community.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,11 @@ public class JWTUtil {
     }
 
     public boolean isExpired(String token) {
-        return getPayloadByToken(token).getExpiration().before(new Date());
+        try {
+            return getPayloadByToken(token).getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     private Claims getPayloadByToken(String token) {
