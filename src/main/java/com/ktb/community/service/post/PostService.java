@@ -5,18 +5,18 @@ import com.ktb.community.dto.post.PostResponseDto;
 import com.ktb.community.entity.post.Post;
 import com.ktb.community.entity.user.User;
 import com.ktb.community.exception.PostNotFoundException;
-import com.ktb.community.repository.post.PostRepository;
+import com.ktb.community.exception.UnauthorizedUserException;
 import com.ktb.community.exception.UserNotFoundException;
+import com.ktb.community.repository.post.PostRepository;
 import com.ktb.community.repository.user.UserRepository;
-import com.ktb.community.utils.MultipartFileSender;
+import com.ktb.community.utils.ClientServerHandler;
+import com.ktb.community.utils.ClientServerHandlerMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
-import static com.ktb.community.utils.ExceptionMessageConst.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +25,11 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    private final MultipartFileSender fileSender;
+    private final ClientServerHandler clientServerHandler;
 
     @Transactional
     public Long addPost(PostRequestDto requestDto, MultipartFile file, Long userId) {
-        if (validRequestDto(requestDto))
-            throw new IllegalArgumentException(ILLEGAL_POST_REQUEST_DTO);
-
-        String imageName = file == null ? "" : fileSender.sendFile(file, "posts");
+        String imageName = file == null ? "" : clientServerHandler.sendFile(file, "", "posts", ClientServerHandlerMethod.POST);
         requestDto.setPostImage(imageName);
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -47,32 +44,37 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponseDto showPost(Long postId) {
-        if (postId == null)
-            throw new IllegalArgumentException(ILLEGAL_POST_ID);
-
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new).toDto();
     }
 
     @Transactional
-    public void editPost(PostRequestDto requestDto) {
-        if (validRequestDto(requestDto) || requestDto.getId() == null)
-            throw new IllegalArgumentException(ILLEGAL_POST_REQUEST_DTO);
-
+    public String editPost(PostRequestDto requestDto, Long userId) {
         Post post = postRepository.findById(requestDto.getId()).orElseThrow(PostNotFoundException::new);
+
+        if (!userId.equals(post.getUser().getId()))
+            throw new UnauthorizedUserException("해당 게시글을 수정할 권한이 없는 사용자입니다.");
+
+        String prevImage = post.getPostImage();
+
+        if ("".equals(requestDto.getPostImage()))
+            requestDto.setPostImage(prevImage);
+
         post.updatePost(requestDto);
+
+        return prevImage.equals(requestDto.getPostImage()) ? "" : prevImage;
     }
 
     @Transactional
-    public void deletePost(Long postId) {
-        if (postId == null)
-            throw new IllegalArgumentException(ILLEGAL_POST_ID);
-
+    public String deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        post.deletePost();
-    }
 
-    private boolean validRequestDto(PostRequestDto requestDto) {
-        if (requestDto == null) return true;
-        return requestDto.getTitle() == null || requestDto.getContent() == null;
+        if (!userId.equals(post.getUser().getId()))
+            throw new UnauthorizedUserException("해당 게시글을 삭제할 권한이 없는 사용자입니다.");
+
+        String prevImage = post.getPostImage();
+
+        post.deletePost();
+
+        return prevImage;
     }
 }

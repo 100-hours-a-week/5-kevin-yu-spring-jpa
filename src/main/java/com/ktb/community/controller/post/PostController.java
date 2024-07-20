@@ -2,18 +2,21 @@ package com.ktb.community.controller.post;
 
 import com.ktb.community.dto.post.PostRequestDto;
 import com.ktb.community.dto.post.PostResponseDto;
-import com.ktb.community.entity.comment.Comment;
-import com.ktb.community.entity.post.Post;
+import com.ktb.community.dto.user.CustomUserDetails;
 import com.ktb.community.service.post.PostService;
-import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -30,17 +33,23 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addPost(@ModelAttribute PostRequestDto postRequestDto,
+    public ResponseEntity<?> addPost(@Valid @ModelAttribute PostRequestDto postRequestDto,
                                         @RequestParam(required = false) MultipartFile file,
-                                        BindingResult bindingResult, HttpSession session) {
+                                        BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors())
+        if (bindingResult.hasErrors()) {
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                log.error(fieldError.getDefaultMessage());
+            }
             return ResponseEntity.badRequest().build();
+        }
+
+        Long userId = getUserId();
+        if (userId == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         Long postId;
         try {
-//            Long userId = (Long) session.getAttribute("userId");
-            Long userId = 1L; // 임시
             postId = postService.addPost(postRequestDto, file, userId);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
@@ -50,19 +59,64 @@ public class PostController {
             return ResponseEntity.internalServerError().build();
 
         URI uri = URI.create("/posts/" + postId);
-        log.info("uri: {}", uri);
 
         return ResponseEntity.created(uri).build();
     }
 
 
-    @GetMapping("/{postNo}")
-    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postNo) {
-        return ResponseEntity.ok(postService.showPost(postNo));
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
+        if (postId == null)
+            return ResponseEntity.badRequest().build();
+
+        return ResponseEntity.ok(postService.showPost(postId));
     }
 
-    @PutMapping("/{postNo}")
-    public ResponseEntity<Void> editPost(@PathVariable Long postNo) {
-        return ResponseEntity.ok().build();
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> editPost(@PathVariable Long postId, @Valid @RequestBody PostRequestDto postRequestDto,
+                                      BindingResult bindingResult) {
+
+        log.info(postRequestDto.toString());
+
+        if (bindingResult.hasErrors()) {
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                log.info(fieldError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().build();
+        }
+
+        Long userId = getUserId();
+        if (userId == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        if (postId == null)
+            return ResponseEntity.notFound().build();
+
+        postRequestDto.setId(postId);
+        String prevImage = postService.editPost(postRequestDto, userId);
+
+        return ResponseEntity.ok().body(Collections.singletonMap("prevImage", prevImage));
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        if (postId == null)
+            return ResponseEntity.badRequest().build();
+
+        Long userId = getUserId();
+
+        if (userId == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        String prevImage = postService.deletePost(postId, userId);
+        return ResponseEntity.ok().body(Collections.singletonMap("prevImage", prevImage));
+    }
+
+    private static Long getUserId() {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return userDetails.getUser().getId();
     }
 }
