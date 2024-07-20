@@ -1,6 +1,7 @@
 package com.ktb.community.repository.post;
 
 import com.ktb.community.entity.post.Post;
+import com.ktb.community.entity.post.PostStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class PostRepositoryImpl implements PostRepository {
         return queryFactory
                 .selectFrom(post)
                 .orderBy(post.createdAt.desc())
+                .where(post.status.eq(PostStatus.ACTIVE))
                 .fetch();
     }
 
