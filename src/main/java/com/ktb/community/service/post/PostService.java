@@ -44,7 +44,10 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponseDto showPost(Long postId) {
-        return postRepository.findById(postId).orElseThrow(PostNotFoundException::new).toDto();
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        post.increaseViews();
+
+        return post.toDto();
     }
 
     @Transactional
