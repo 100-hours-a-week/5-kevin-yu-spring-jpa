@@ -73,6 +73,10 @@ public class Post {
         deletedAt = LocalDateTime.now();
     }
 
+    public void increaseViews() {
+        views++;
+    }
+
     public void increaseCommentCount() {
         commentCount++;
     }
