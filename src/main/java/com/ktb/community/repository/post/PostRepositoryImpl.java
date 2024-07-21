@@ -44,7 +44,8 @@ public class PostRepositoryImpl implements PostRepository {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(post)
-                        .where(post.id.eq(id))
+                        .where(post.id.eq(id)
+                            .and(post.status.eq(PostStatus.ACTIVE)))
                         .fetchOne()
         );
     }

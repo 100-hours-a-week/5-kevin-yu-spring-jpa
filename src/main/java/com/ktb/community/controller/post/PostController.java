@@ -3,6 +3,7 @@ package com.ktb.community.controller.post;
 import com.ktb.community.dto.post.PostRequestDto;
 import com.ktb.community.dto.post.PostResponseDto;
 import com.ktb.community.dto.user.CustomUserDetails;
+import com.ktb.community.exception.UnauthorizedUserException;
 import com.ktb.community.service.post.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -93,9 +94,12 @@ public class PostController {
             return ResponseEntity.notFound().build();
 
         postRequestDto.setId(postId);
-        String prevImage = postService.editPost(postRequestDto, userId);
-
-        return ResponseEntity.ok().body(Collections.singletonMap("prevImage", prevImage));
+        try {
+            String prevImage = postService.editPost(postRequestDto, userId);
+            return ResponseEntity.ok().body(Collections.singletonMap("prevImage", prevImage));
+        } catch (UnauthorizedUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @DeleteMapping("/{postId}")

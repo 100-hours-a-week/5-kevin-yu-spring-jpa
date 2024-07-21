@@ -1,6 +1,7 @@
 package com.ktb.community.entity.comment;
 
 import com.ktb.community.dto.comment.CommentRequestDto;
+import com.ktb.community.dto.comment.CommentResponseDto;
 import com.ktb.community.entity.post.Post;
 import com.ktb.community.entity.user.User;
 import jakarta.persistence.*;
@@ -40,6 +41,16 @@ public class Comment {
     @Column
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
+
+    public CommentResponseDto toDto() {
+        return CommentResponseDto.builder()
+                .id(id)
+                .content(content)
+                .createAt(createdAt)
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .build();
+    }
 
     public void updateComment(CommentRequestDto commentDto) {
         this.content = commentDto.getContent();

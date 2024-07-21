@@ -72,4 +72,12 @@ public class Post {
         status = PostStatus.DELETED;
         deletedAt = LocalDateTime.now();
     }
+
+    public void increaseCommentCount() {
+        commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        commentCount--;
+    }
 }
